@@ -5,6 +5,7 @@ import (
     "net/http"
 )
 
+// healthHandler responds to health check requests with a simple "OK" body and a 200 status code.
 func healthHandler(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
     if _, err := w.Write([]byte("OK")); err != nil {
