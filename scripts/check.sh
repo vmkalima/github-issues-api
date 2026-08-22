@@ -4,6 +4,9 @@ set -euo pipefail
 echo "** Validating YML..."
 python3 -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"
 
+echo "** Building..."
+go build ./...
+
 echo "** Running go vet..."
 go vet ./...
 
