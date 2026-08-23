@@ -4,7 +4,7 @@ import (
     "log"
     "net/http"
     "os"
-
+    "time"
     "github.com/vmkalima/github-issues-api/internal/issues"
     "github.com/vmkalima/github-issues-api/internal/api"
 )
@@ -33,8 +33,17 @@ func main() {
     mux.Handle("GET /repos/{owner}/{repo}/issues", api.RequireAuth(apiToken, http.HandlerFunc(handler.ListIssues)))
     mux.Handle("DELETE /repos/{owner}/{repo}/issues/{number}", api.RequireAuth(apiToken, http.HandlerFunc(handler.CloseIssue)))
 
+    server := &http.Server{
+        Addr:    ":8080",
+        Handler: mux,
+        ReadHeaderTimeout:  5 * time.Second,
+        ReadTimeout:      10 * time.Second,
+        WriteTimeout:     10 * time.Second,
+        IdleTimeout:      60 * time.Second,
+    }
+
     log.Println("Starting server on port :8080")
-    if err := http.ListenAndServe(":8080", mux); err != nil {
+    if err := server.ListenAndServe(); err != nil {
         log.Fatal(err)
     }
 }
