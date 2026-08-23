@@ -3,6 +3,7 @@ package main
 import (
     "log"
     "net/http"
+    "os"
 
     "github.com/vmkalima/github-issues-api/internal/issues"
     "github.com/vmkalima/github-issues-api/internal/api"
@@ -18,14 +19,19 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+    apiToken := os.Getenv("API_TOKEN")
+    if apiToken == "" {
+        log.Fatal("API_TOKEN environment variable is not set")
+    }
+
     service := issues.NewFake()
     handler := api.NewHandler(service)
 
     mux := http.NewServeMux()
     mux.HandleFunc("/health", healthHandler)
-    mux.HandleFunc("POST /repos/{owner}/{repo}/issues", handler.CreateIssue)
-    mux.HandleFunc("GET /repos/{owner}/{repo}/issues", handler.ListIssues)
-    mux.HandleFunc("DELETE /repos/{owner}/{repo}/issues/{number}", handler.CloseIssue)
+    mux.Handle("POST /repos/{owner}/{repo}/issues", api.RequireAuth(apiToken, http.HandlerFunc(handler.CreateIssue)))
+    mux.Handle("GET /repos/{owner}/{repo}/issues", api.RequireAuth(apiToken, http.HandlerFunc(handler.ListIssues)))
+    mux.Handle("DELETE /repos/{owner}/{repo}/issues/{number}", api.RequireAuth(apiToken, http.HandlerFunc(handler.CloseIssue)))
 
     log.Println("Starting server on port :8080")
     if err := http.ListenAndServe(":8080", mux); err != nil {
