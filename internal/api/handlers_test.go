@@ -6,6 +6,7 @@ import(
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"context"
 
 	"github.com/vmkalima/github-issues-api/internal/issues"
 )
@@ -92,5 +93,64 @@ func TestCreateIssueInvalidJSON(t *testing.T) {
 
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("Expected status code %d, got %d", http.StatusBadRequest, w.Code)
+	}
+}
+
+// TestListIssues tests the ListIssues handler of the API. It verifies that the handler correctly retrieves and returns a list of issues for a specified repository.
+func TestListIssues(t *testing.T) {
+	service := issues.NewFake()
+	handler := NewHandler(service)
+
+	ctx := context.Background()
+	if _, err := service.Create(ctx, "testowner", "testrepo", "Issue 1"); err != nil {
+		t.Fatalf("Failed to create issue: %v", err)
+	}
+	if _, err := service.Create(ctx, "testowner", "testrepo", "Issue 2"); err != nil {
+		t.Fatalf("Failed to create issue: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/repos/testowner/testrepo/issues", nil)
+	req.SetPathValue("owner", "testowner")
+	req.SetPathValue("repo", "testrepo")
+	w := httptest.NewRecorder()
+
+	handler.ListIssues(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+	
+	var issuesList []issues.Issue
+	if err := json.NewDecoder(w.Body).Decode(&issuesList); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if len(issuesList) != 2 {
+		t.Errorf("Expected 2 issues, got %d", len(issuesList))
+	}
+}
+
+// TestListIssuesEmpty tests the ListIssues handler when there are no issues in the specified repository. It verifies that the handler returns an empty list and a 200 OK status code.
+func TestListIssuesEmpty(t *testing.T) {
+	service := issues.NewFake()
+	handler := NewHandler(service)
+
+	req := httptest.NewRequest(http.MethodGet, "/repos/testowner/testrepo/issues", nil)
+	req.SetPathValue("owner", "testowner")
+	req.SetPathValue("repo", "testrepo")
+	w := httptest.NewRecorder()
+
+	handler.ListIssues(w, req)
+	
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	var issuesList []issues.Issue
+	if err := json.NewDecoder(w.Body).Decode(&issuesList); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+	if len(issuesList) != 0 {
+		t.Errorf("Expected 0 issues, got %d", len(issuesList))
 	}
 }
