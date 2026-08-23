@@ -7,6 +7,7 @@ import(
 	"net/http/httptest"
 	"testing"
 	"context"
+	"strconv"
 
 	"github.com/vmkalima/github-issues-api/internal/issues"
 )
@@ -152,5 +153,71 @@ func TestListIssuesEmpty(t *testing.T) {
 	}
 	if len(issuesList) != 0 {
 		t.Errorf("Expected 0 issues, got %d", len(issuesList))
+	}
+}
+
+// TestCloseIssue tests the CloseIssue handler of the API. It verifies that an existing issue can be closed successfully and that the response reflects the updated state of the issue.
+func TestCloseIssue(t *testing.T) {
+	service := issues.NewFake()
+	handler := NewHandler(service)
+
+	ctx := context.Background()
+	issue, err := service.Create(ctx, "testowner", "testrepo", "Issue to close")
+	if err != nil {
+		t.Fatalf("Failed to create issue: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodDelete, "/repos/testowner/testrepo/issues/1", nil)
+	req.SetPathValue("owner", "testowner")
+	req.SetPathValue("repo", "testrepo")
+	req.SetPathValue("number", strconv.Itoa(issue.Number))
+	w := httptest.NewRecorder()
+
+	handler.CloseIssue(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	var closedIssue issues.Issue
+	if err := json.NewDecoder(w.Body).Decode(&closedIssue); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+	if closedIssue.State != "closed" {
+		t.Errorf("Expected issue state 'closed', got '%s'", closedIssue.State)
+	}
+}
+
+// TestCloseIssueNotFound tests the CloseIssue handler when attempting to close a non-existent issue. It verifies that the handler responds with a Not Found status code.
+func TestCloseIssueNotFound(t *testing.T) {
+	handler := NewHandler(issues.NewFake())
+
+	req := httptest.NewRequest(http.MethodDelete, "/repos/testowner/testrepo/issues/42", nil)
+	req.SetPathValue("owner", "testowner")
+	req.SetPathValue("repo", "testrepo")
+	req.SetPathValue("number", "42")
+	w := httptest.NewRecorder()
+
+	handler.CloseIssue(w, req)
+
+	if w.Code != http.StatusNotFound {
+		t.Fatalf("Expected status code %d, got %d", http.StatusNotFound, w.Code)
+	}
+}
+
+// TestCloseIssueInvalidNumber tests the CloseIssue handler with an invalid issue number. It verifies that the handler responds with a Bad Request status code when the issue number is not a valid integer.
+func TestCloseIssueInvalidNumber(t *testing.T) {
+	handler := NewHandler(issues.NewFake())
+
+	req := httptest.NewRequest(http.MethodDelete, "/repos/testowner/testrepo/issues/invalid", nil)
+	req.SetPathValue("owner", "testowner")
+	req.SetPathValue("repo", "testrepo")
+	req.SetPathValue("number", "invalid")
+	w := httptest.NewRecorder()
+
+	handler.CloseIssue(w, req)
+	
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("Expected status code %d, got %d", http.StatusBadRequest, w.Code)
 	}
 }

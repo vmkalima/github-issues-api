@@ -25,6 +25,7 @@ func main() {
     mux.HandleFunc("/health", healthHandler)
     mux.HandleFunc("POST /repos/{owner}/{repo}/issues", handler.CreateIssue)
     mux.HandleFunc("GET /repos/{owner}/{repo}/issues", handler.ListIssues)
+    mux.HandleFunc("DELETE /repos/{owner}/{repo}/issues/{number}", handler.CloseIssue)
 
     log.Println("Starting server on port :8080")
     if err := http.ListenAndServe(":8080", mux); err != nil {

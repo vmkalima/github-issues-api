@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"github.com/vmkalima/github-issues-api/internal/issues"
+	"strconv"
 )
 
 // maxTitleLength defines the maximum allowed length for an issue title. This constant is used to validate the title length when creating a new issue.
@@ -58,7 +59,7 @@ func (h *Handler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// 
+// ListIssues handles the HTTP request for listing all GitHub issues in a specified repository. It retrieves the owner and repository name from the request path, calls the issues service to get the list of issues, and responds with the issues in JSON format. If any error occurs during this process, it responds with an appropriate HTTP status code and error message.
 func (h *Handler) ListIssues(w http.ResponseWriter, r *http.Request) {
 	owner := r.PathValue("owner")
 	repo := r.PathValue("repo")
@@ -72,6 +73,34 @@ func (h *Handler) ListIssues(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(issues); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
+}
+
+// CloseIssue handles DELETE /repos/{owner}/{repo}/issues/{number}.
+//
+// GitHub's API does not support permanently deleting issues, only closing
+// them, so this endpoint closes the issue rather than removing it.
+func (h *Handler) CloseIssue(w http.ResponseWriter, r *http.Request) {
+	owner := r.PathValue("owner")
+	repo := r.PathValue("repo")
+
+	number, err := strconv.Atoi(r.PathValue("number"))
+	if err != nil {
+		http.Error(w, "Invalid issue number", http.StatusBadRequest)
+		return
+	}
+
+	issue, err := h.Service.Close(r.Context(), owner, repo, number)
+	if err != nil {
+		http.Error(w, "Issue not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(issue); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}
