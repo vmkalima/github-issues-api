@@ -22,6 +22,12 @@ gosec ./...
 echo "** Running govulncheck..."
 govulncheck ./...
 
+echo "** Building Docker image..."
+docker build -t github-issues-api .
+
+echo "** Running Trivy scan"
+trivy image github-issues-api --severity HIGH,CRITICAL --exit-code 1
+
 echo "** Simulating full CI pipeline locally (act)..."
 /usr/local/bin/act
 
