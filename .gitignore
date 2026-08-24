@@ -2,3 +2,4 @@
 /bin/
 *.sh
 !scripts/*.sh
+deploy/k8s/secret.yaml
