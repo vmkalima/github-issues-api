@@ -24,7 +24,18 @@ func main() {
         log.Fatal("API_TOKEN environment variable is not set")
     }
 
-    service := issues.NewFake()
+    githubToken := os.Getenv("GITHUB_TOKEN")
+    if apiToken == ""{
+        log.Fatal("API_TOKEN environment variable must be set")
+    }
+
+//     Local fake service
+    
+//     service := issues.NewFake()
+//     handler := api.NewHandler(service)
+
+//      Actual GitHub API service
+    service := issues.NewGithubService(githubToken)
     handler := api.NewHandler(service)
 
     mux := http.NewServeMux()
