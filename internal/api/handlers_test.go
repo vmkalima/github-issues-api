@@ -103,10 +103,10 @@ func TestListIssues(t *testing.T) {
 	handler := NewHandler(service)
 
 	ctx := context.Background()
-	if _, err := service.Create(ctx, "testowner", "testrepo", "Issue 1"); err != nil {
+	if _, err := service.Create(ctx, "testowner", "testrepo", "Issue 1", ""); err != nil {
 		t.Fatalf("Failed to create issue: %v", err)
 	}
-	if _, err := service.Create(ctx, "testowner", "testrepo", "Issue 2"); err != nil {
+	if _, err := service.Create(ctx, "testowner", "testrepo", "Issue 2", ""); err != nil {
 		t.Fatalf("Failed to create issue: %v", err)
 	}
 
@@ -162,7 +162,7 @@ func TestCloseIssue(t *testing.T) {
 	handler := NewHandler(service)
 
 	ctx := context.Background()
-	issue, err := service.Create(ctx, "testowner", "testrepo", "Issue to close")
+	issue, err := service.Create(ctx, "testowner", "testrepo", "Issue to close", "")
 	if err != nil {
 		t.Fatalf("Failed to create issue: %v", err)
 	}

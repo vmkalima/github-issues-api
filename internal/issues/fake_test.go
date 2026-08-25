@@ -10,7 +10,7 @@ func TestFakeCreateAndList(t *testing.T) {
 	ctx := context.Background()
 	fake := NewFake()
 
-	created, err := fake.Create(ctx, "vmkalima", "some-repo", "First issue")
+	created, err := fake.Create(ctx, "vmkalima", "some-repo", "First issue", "")
 	if err != nil {
 		t.Fatalf("Create returned unexpected error: %v", err)
 	}
@@ -32,7 +32,7 @@ func TestFakeClose(t *testing.T) {
 	ctx := context.Background()
 	fake := NewFake()
 
-	created, err := fake.Create(ctx, "vmkalima", "some-repo", "To be closed")
+	created, err := fake.Create(ctx, "vmkalima", "some-repo", "To be closed", "")
 	if err != nil {
 		t.Fatalf("Create returned unexpected error: %v", err)
 	}
@@ -76,12 +76,12 @@ func TestFakeRepoIsolation(t *testing.T) {
 	ctx := context.Background()
 	fake := NewFake()
 
-	issueA, err := fake.Create(ctx, "vmkalima", "repoA", "Issue in repo A")
+	issueA, err := fake.Create(ctx, "vmkalima", "repoA", "Issue in repo A", "")
 	if err != nil {
 		t.Fatalf("Create returned unexpected error: %v", err)
 	}
 
-	issueB, err := fake.Create(ctx, "vmkalima", "repoB", "Issue in repo B")
+	issueB, err := fake.Create(ctx, "vmkalima", "repoB", "Issue in repo B", "")
 	if err != nil {
 		t.Fatalf("Create returned unexpected error: %v", err)
 	}

@@ -21,9 +21,10 @@ func NewGithubService(token string) *GitHubService {
 var _ Service = (*GitHubService)(nil)
 
 // Create opens a new issue titled title in owner/repo via the GitHub API.
-func (g *GitHubService) Create(ctx context.Context, owner, repo, title string) (*Issue, error) {
+func (g *GitHubService) Create(ctx context.Context, owner, repo, title, body string) (*Issue, error) {
 	ghIssue, _, err := g.client.Issues.Create(ctx, owner, repo, &github.IssueRequest{
 		Title: &title,
+		Body: &body,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error creating issue: %w", err)
@@ -64,5 +65,6 @@ func toIssue(gi *github.Issue) *Issue {
 		Number: gi.GetNumber(),
 		Title: gi.GetTitle(),
 		State: gi.GetState(),
+		Body: gi.GetBody(),
 	}
 }

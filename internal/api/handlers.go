@@ -22,6 +22,7 @@ func NewHandler(service issues.Service) *Handler {
 
 type createIssueRequest struct {
 	Title string `json:"title"`
+	Body string `json:"body,omitempty"`
 }
 
 // CreateIssue handles the HTTP request for creating a new GitHub issue. It reads the request body to extract the issue title, calls the issues service to create the issue, and responds with the created issue in JSON format. If any error occurs during this process, it responds with an appropriate HTTP status code and error message.
@@ -45,7 +46,7 @@ func (h *Handler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	issue, err := h.Service.Create(r.Context(), owner, repo, req.Title)
+	issue, err := h.Service.Create(r.Context(), owner, repo, req.Title, req.Body)
 	if err != nil {
 		http.Error(w, "Failed to create issue: "+err.Error(), http.StatusInternalServerError)
 		return

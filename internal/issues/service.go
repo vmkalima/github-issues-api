@@ -8,11 +8,12 @@ type Issue struct{
 	Number int `json:"number"`
 	Title string `json:"title"`
 	State string `json:"state"`
+	Body string `json:"body,omitempty"`
 }
 
 // Service defines the operations this API provides for managing issues on a given repository
 type Service interface {
-	Create(ctx context.Context, owner, repo, title string) (*Issue, error)
+	Create(ctx context.Context, owner, repo, title string, body string) (*Issue, error)
 	List(ctx context.Context, owner, repo string) ([]*Issue, error)
 	Close(ctx context.Context, owner, repo string, number int) (*Issue, error)
 }

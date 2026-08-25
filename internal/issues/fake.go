@@ -29,7 +29,7 @@ func repoKey(owner, repo string) string {
 }
 
 // Create creates a new issue in the specified repository with the given title. It returns the created issue or an error if the operation fails.
-func (f *Fake) Create(ctx context.Context, owner, repo, title string) (*Issue, error) {
+func (f *Fake) Create(ctx context.Context, owner, repo, title, body string) (*Issue, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
@@ -43,6 +43,7 @@ func (f *Fake) Create(ctx context.Context, owner, repo, title string) (*Issue, e
 	issue := &Issue{
 		Number: f.nextID[key],
 		Title:  title,
+		Body: body,
 		State:  "open",
 	}
 	f.issues[key][issue.Number] = issue
