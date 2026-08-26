@@ -3,8 +3,7 @@ FROM golang:1.26 AS builder
 
 WORKDIR /app
 
-# Add go.sum after github dependencies are used
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
