@@ -56,11 +56,14 @@ behalf.
 
 ## Running it
 
-Rename `secret.example.yaml` to secret.yaml and insert your tokens in the corresponding fields.
 
 ### Locally
 
+Export your tokens into the environment, and run the corresponding script:
+
 ```bash
+export API_TOKEN="choose-a-secret"
+export GITHUB_TOKEN="fine-grained-PAT"
 ./scripts/run-local.sh
 ```
 
@@ -75,6 +78,8 @@ docker run -p 8080:8080 \
 ```
 
 ### On Kubernetes (minikube)
+
+Rename `secret.example.yaml` to `secret.yaml` and insert your tokens in the corresponding fields. Then run:
 
 ```bash
 ./scripts/deploy-local.sh
