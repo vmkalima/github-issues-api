@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// TestHealthHandler tests the health of the server by checking whether it returns an OK status through the health handler
 func TestHealthHandler(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/health", nil)
 	w := httptest.NewRecorder()
