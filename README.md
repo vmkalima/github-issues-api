@@ -58,11 +58,7 @@ behalf.
 
 ### Locally
 
-```bash
-export API_TOKEN="choose-a-secret"
-export GITHUB_TOKEN="fine-grained-PAT-scoped-to-Issues-only"
-./scripts/run-local.sh
-```
+Rename `secret.example.yaml` to secret.yaml and insert your tokens in the corresponding fields
 
 ### In Docker
 

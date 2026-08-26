@@ -99,7 +99,8 @@ jobs:
       - name: Create namespace secret
         run: |
           kubectl create secret generic github-issues-api-secret \
-            --from-literal=API_TOKEN=ci-test-token
+            --from-literal=API_TOKEN=ci-test-token \
+            --from-literal=GITHUB_TOKEN=ci-test-github-token
 
       - name: Apply manifests
         run: |

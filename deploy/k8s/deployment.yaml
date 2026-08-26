@@ -24,6 +24,11 @@ spec:
             secretKeyRef:
               name: github-issues-api-secret
               key: API_TOKEN
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-issues-api-secret
+              key: GITHUB_TOKEN
         resources:
           requests:
             memory: "64Mi"
