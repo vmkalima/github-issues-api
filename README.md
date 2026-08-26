@@ -56,9 +56,13 @@ behalf.
 
 ## Running it
 
+Rename `secret.example.yaml` to secret.yaml and insert your tokens in the corresponding fields.
+
 ### Locally
 
-Rename `secret.example.yaml` to secret.yaml and insert your tokens in the corresponding fields
+```bash
+./scripts/run-local.sh
+```
 
 ### In Docker
 
